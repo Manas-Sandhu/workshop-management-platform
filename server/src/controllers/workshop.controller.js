@@ -41,7 +41,25 @@ async function getPublishedWorkshops(req, res, next) {
   }
 }
 
+async function updateWorkshop(req, res, next) {
+  try {
+    const workshop = await workshopService.updateWorkshop(
+      req.params.id,
+      req.body
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Workshop updated successfully",
+      data: workshop,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
   createWorkshop,
   getPublishedWorkshops,
+  updateWorkshop,
 };

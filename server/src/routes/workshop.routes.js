@@ -5,6 +5,7 @@ const workshopController = require("../controllers/workshop.controller");
 const { authenticateAdmin } = require("../middleware/admin.middleware");
 const { validateRequest } = require("../middleware/validation.middleware");
 const { createWorkshopSchema } = require("../validators/workshop.validator");
+const { updateWorkshopSchema } = require("../validators/workshop.validator");
 
 router.post(
   "/",
@@ -18,6 +19,12 @@ router.get(
   workshopController.getPublishedWorkshops
 );
 
+router.patch(
+  "/:id",
+  authenticateAdmin,
+  validateRequest(updateWorkshopSchema),
+  workshopController.updateWorkshop
+);
 
 module.exports = router;
 

@@ -72,7 +72,51 @@ async function getPublishedWorkshops(page = 1, limit = 10) {
   };
 }
 
+async function updateWorkshop(workshopId, workshopData) {
+  return prisma.$transaction(async (tx) => {
+    const existingWorkshop = await tx.workshop.findUnique({
+      where: { id: workshopId },
+      include: {
+        _count: {
+          select: {
+            registrations: true,
+          },
+        },
+      },
+    });
+
+    if (!existingWorkshop) {
+      const error = new Error("Workshop not found");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    if (
+      workshopData.capacity !== undefined &&
+      workshopData.capacity < existingWorkshop._count.registrations
+    ) {
+      const error = new Error(
+        "Capacity cannot be less than existing registrations"
+      );
+      error.statusCode = 400;
+      throw error;
+    }
+
+    const updateData = { ...workshopData };
+
+    if (updateData.dateTime !== undefined) {
+      updateData.dateTime = new Date(updateData.dateTime);
+    }
+
+    return tx.workshop.update({
+      where: { id: workshopId },
+      data: updateData,
+    });
+  });
+}
+
 module.exports = {
   createWorkshop,
   getPublishedWorkshops,
+  updateWorkshop,
 };
