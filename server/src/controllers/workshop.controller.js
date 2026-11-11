@@ -17,6 +17,31 @@ async function createWorkshop(req, res, next) {
   }
 }
 
+async function getPublishedWorkshops(req, res, next) {
+  try {
+    const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+    const limit = Math.min(
+      50,
+      Math.max(1, parseInt(req.query.limit, 10) || 10)
+    );
+
+    const result = await workshopService.getPublishedWorkshops(
+      page,
+      limit
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Published workshops fetched successfully",
+      data: result.workshops,
+      pagination: result.pagination,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
   createWorkshop,
+  getPublishedWorkshops,
 };

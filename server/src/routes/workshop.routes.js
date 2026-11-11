@@ -13,6 +13,10 @@ router.post(
   workshopController.createWorkshop
 );
 
+router.get(
+  "/",
+  workshopController.getPublishedWorkshops
+);
 
 
 module.exports = router;

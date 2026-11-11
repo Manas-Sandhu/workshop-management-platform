@@ -21,5 +21,6 @@ app.get("/api/v1/health", (req, res) => {
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/admin", adminRoutes);
 app.use("/api/v1/admin/workshops", workshopRoutes);
+app.use("/api/v1/workshops", workshopRoutes);
 
 module.exports = app;
