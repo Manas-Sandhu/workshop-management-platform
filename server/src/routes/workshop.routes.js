@@ -3,11 +3,17 @@ const router = express.Router();
 
 const workshopController = require("../controllers/workshop.controller");
 const { authenticateAdmin } = require("../middleware/admin.middleware");
+const { validateRequest } = require("../middleware/validation.middleware");
+const { createWorkshopSchema } = require("../validators/workshop.validator");
 
 router.post(
   "/",
   authenticateAdmin,
+  validateRequest(createWorkshopSchema),
   workshopController.createWorkshop
 );
 
+
+
 module.exports = router;
+
