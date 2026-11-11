@@ -5,6 +5,7 @@ const authRoutes = require("./routes/auth.routes");
 const adminRoutes = require("./routes/admin.routes");
 const workshopRoutes = require("./routes/workshop.routes");
 const registrationRoutes = require("./routes/registration.routes");
+const adminRegistrationRoutes = require("./routes/admin-registration.routes");
 
 const app = express();
 
@@ -20,6 +21,9 @@ app.get("/api/v1/health", (req, res) => {
 
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/admin", adminRoutes);
+
+app.use("/api/v1/admin", adminRegistrationRoutes);
+
 app.use("/api/v1/admin/workshops", workshopRoutes);
 app.use("/api/v1/workshops", workshopRoutes);
 
@@ -33,6 +37,7 @@ app.use((req, res) => {
     message: "Route not found",
   });
 });
+
 
 // Global error handler must be last
 const { errorHandler } = require("./middleware/error.middleware");
