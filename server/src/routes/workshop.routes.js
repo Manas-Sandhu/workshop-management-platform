@@ -26,5 +26,11 @@ router.patch(
   workshopController.updateWorkshop
 );
 
+router.patch(
+  "/:id/cancel",
+  authenticateAdmin,
+  workshopController.cancelWorkshop
+);
+
 module.exports = router;
 

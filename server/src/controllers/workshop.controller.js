@@ -58,8 +58,25 @@ async function updateWorkshop(req, res, next) {
   }
 }
 
+async function cancelWorkshop(req, res, next) {
+  try {
+    const workshop = await workshopService.cancelWorkshop(
+      req.params.id
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Workshop cancelled successfully",
+      data: workshop,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
   createWorkshop,
   getPublishedWorkshops,
   updateWorkshop,
+  cancelWorkshop,
 };
