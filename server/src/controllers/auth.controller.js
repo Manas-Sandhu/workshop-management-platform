@@ -1,6 +1,7 @@
 
 const crypto = require("crypto");
 const authService = require("../services/auth.service");
+const { prisma } = require("../db");
 
 const COOKIE_NAME = "sessionToken";
 
@@ -13,13 +14,9 @@ const cookieOptions = {
 };
 
 function hashToken(token) {
-  return crypto
-    .createHash("sha256")
-    .update(token)
-    .digest("hex");
+  return crypto.createHash("sha256").update(token).digest("hex");
 }
 
-// Register
 async function register(req, res, next) {
   try {
     const user = await authService.registerUser(req.body);
@@ -34,7 +31,6 @@ async function register(req, res, next) {
   }
 }
 
-// Login
 async function login(req, res, next) {
   try {
     const result = await authService.loginUser(req.body);
@@ -44,25 +40,20 @@ async function login(req, res, next) {
     return res.status(200).json({
       success: true,
       message: "Login successful",
-      data: {
-        user: result.user,
-      },
+      data: { user: result.user },
     });
   } catch (error) {
     next(error);
   }
 }
 
-// Logout
 async function logout(req, res, next) {
   try {
-    const token = req.cookies[COOKIE_NAME];
+    const token = req.cookies?.[COOKIE_NAME];
 
     if (token) {
-      const tokenHash = hashToken(token);
-
-      await require("../db").prisma.refreshToken.deleteMany({
-        where: { tokenHash },
+      await prisma.refreshToken.deleteMany({
+        where: { tokenHash: hashToken(token) },
       });
     }
 
@@ -82,8 +73,4 @@ async function logout(req, res, next) {
   }
 }
 
-module.exports = {
-  register,
-  login,
-  logout,
-};
+module.exports = { register, login, logout };

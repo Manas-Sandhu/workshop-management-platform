@@ -14,7 +14,6 @@ function createError(message, statusCode) {
 
 async function registerUser({ name, email, password }) {
   const normalizedEmail = email.trim().toLowerCase();
-
   const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
 
   try {
@@ -23,6 +22,7 @@ async function registerUser({ name, email, password }) {
         name: name.trim(),
         email: normalizedEmail,
         passwordHash,
+        // Role defaults to USER in the Prisma schema.
       },
       select: {
         id: true,
@@ -47,7 +47,7 @@ async function loginUser({ email, password }) {
     where: { email: normalizedEmail },
   });
 
-  if (!user) {
+  if (!user || user.role !== "USER") {
     throw createError("Invalid email or password", 401);
   }
 
@@ -60,10 +60,8 @@ async function loginUser({ email, password }) {
     throw createError("Invalid email or password", 401);
   }
 
-  // Generate a random session token
   const sessionToken = crypto.randomBytes(32).toString("hex");
 
-  // Store only its hash in the database
   const tokenHash = crypto
     .createHash("sha256")
     .update(sessionToken)
@@ -83,7 +81,6 @@ async function loginUser({ email, password }) {
 
   return {
     sessionToken,
-    expiresAt,
     user: {
       id: user.id,
       name: user.name,
