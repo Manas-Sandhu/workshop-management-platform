@@ -115,8 +115,34 @@ async function updateWorkshop(workshopId, workshopData) {
   });
 }
 
+async function cancelWorkshop(workshopId) {
+  const workshop = await prisma.workshop.findUnique({
+    where: { id: workshopId },
+  });
+
+  if (!workshop) {
+    const error = new Error("Workshop not found");
+    error.statusCode = 404;
+    throw error;
+  }
+
+  if (workshop.status === "CANCELLED") {
+    const error = new Error("Workshop is already cancelled");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  return prisma.workshop.update({
+    where: { id: workshopId },
+    data: {
+      status: "CANCELLED",
+    },
+  });
+}
+
 module.exports = {
   createWorkshop,
   getPublishedWorkshops,
   updateWorkshop,
+  cancelWorkshop,
 };
