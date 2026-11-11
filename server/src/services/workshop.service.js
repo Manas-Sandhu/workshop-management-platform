@@ -41,7 +41,6 @@ async function getPublishedWorkshops(page = 1, limit = 10) {
         description: true,
         dateTime: true,
         capacity: true,
-        whatsappLink: true,
         createdAt: true,
       },
       orderBy: {
