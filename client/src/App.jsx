@@ -126,15 +126,6 @@ export default function App() {
             />
 
             <Route
-              path="/admin/registrations"
-              element={
-                <AdminProtectedRoute>
-                  <PlaceholderPage title="All Registrations" />
-                </AdminProtectedRoute>
-              }
-            />
-
-            <Route
               path="/admin/workshops/:workshopId/registrations"
               element={
                 <AdminProtectedRoute>
