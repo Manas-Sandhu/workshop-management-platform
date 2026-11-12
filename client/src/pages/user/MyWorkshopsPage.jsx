@@ -10,7 +10,10 @@ import {
 } from "lucide-react";
 
 import { useAuth } from "../../context/AuthContext";
-import { getMyRegistrations } from "../../services/registrationService";
+import {
+  getMyRegistrations,
+  clearMyRegistrationsCache,
+} from "../../services/registrationService";
 
 function formatDate(date) {
   return new Date(date).toLocaleDateString("en-IN", {
@@ -60,6 +63,7 @@ function StatusBadge({ status, upcoming }) {
 function RegistrationCard({ registration }) {
   const workshop = registration.workshop;
   const upcoming = isUpcoming(registration);
+
   const canJoinGroup =
     upcoming &&
     workshop.status !== "CANCELLED" &&
@@ -142,7 +146,7 @@ function RegistrationCard({ registration }) {
 }
 
 export default function MyWorkshopsPage() {
-  const { isAuthenticated, authLoading } = useAuth();
+  const { user, isAuthenticated, authLoading } = useAuth();
 
   const [registrations, setRegistrations] = useState([]);
   const [pagination, setPagination] = useState(null);
@@ -155,7 +159,7 @@ export default function MyWorkshopsPage() {
   useEffect(() => {
     if (authLoading) return;
 
-    if (!isAuthenticated) {
+    if (!isAuthenticated || !user?.id) {
       setRegistrations([]);
       setPagination(null);
       setLoading(false);
@@ -169,7 +173,12 @@ export default function MyWorkshopsPage() {
         setLoading(true);
         setError("");
 
-        const result = await getMyRegistrations(page);
+        const result = await getMyRegistrations(
+          page,
+          10,
+          user.id,
+          refreshKey > 0
+        );
 
         if (active) {
           setRegistrations(result.registrations);
@@ -194,7 +203,7 @@ export default function MyWorkshopsPage() {
     return () => {
       active = false;
     };
-  }, [page, refreshKey, isAuthenticated, authLoading]);
+  }, [page, refreshKey, isAuthenticated, authLoading, user?.id]);
 
   const filteredRegistrations = useMemo(() => {
     if (activeTab === "upcoming") {
@@ -220,6 +229,14 @@ export default function MyWorkshopsPage() {
 
     return registrations;
   }, [registrations, activeTab]);
+
+  function handleRefresh() {
+    if (user?.id) {
+      clearMyRegistrationsCache(user.id);
+    }
+
+    setRefreshKey((current) => current + 1);
+  }
 
   if (authLoading) {
     return (
@@ -293,7 +310,7 @@ export default function MyWorkshopsPage() {
 
           <button
             type="button"
-            onClick={() => setRefreshKey((current) => current + 1)}
+            onClick={handleRefresh}
             disabled={loading}
             className="inline-flex items-center gap-2 rounded-full border border-navy/15 px-5 py-2.5 text-sm font-semibold text-navy transition hover:border-gold disabled:opacity-40"
           >
@@ -344,7 +361,7 @@ export default function MyWorkshopsPage() {
 
             <button
               type="button"
-              onClick={() => setRefreshKey((current) => current + 1)}
+              onClick={handleRefresh}
               className="mt-5 inline-flex items-center gap-2 rounded-full bg-navy px-6 py-3 text-sm font-semibold text-white"
             >
               <RefreshCw size={16} />

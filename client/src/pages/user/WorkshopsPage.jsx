@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 
 import { getPublishedWorkshops } from "../../services/workshopService";
+import { useAuth } from "../../context/AuthContext";
 
 function formatDate(dateTime) {
   return new Date(dateTime).toLocaleDateString("en-IN", {
@@ -108,6 +109,8 @@ function LoadingCard() {
 }
 
 export default function WorkshopsPage() {
+  const { user } = useAuth();
+
   const [workshops, setWorkshops] = useState([]);
   const [pagination, setPagination] = useState(null);
   const [page, setPage] = useState(1);
@@ -137,7 +140,8 @@ export default function WorkshopsPage() {
         page,
         6,
         search,
-        sort
+        sort,
+        user?.id || "guest"
       );
 
       setWorkshops(result.workshops);
@@ -150,7 +154,7 @@ export default function WorkshopsPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, search, sort]);
+  }, [page, search, sort, user?.id]);
 
   useEffect(() => {
     fetchWorkshops();
