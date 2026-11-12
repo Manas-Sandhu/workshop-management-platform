@@ -40,6 +40,8 @@ It consists of two primary portals:
 - User registration and workshop booking.
 - Relational database management.
 - Email notifications.
+  <img width="945" height="571" alt="image" src="https://github.com/user-attachments/assets/6573a8fa-7325-4ccd-8cea-9409bf5201f7" />
+
 - Automated workshop reminders.
 - WhatsApp group redirection.
 - Secure REST API architecture.
