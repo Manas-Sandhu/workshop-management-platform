@@ -7,7 +7,7 @@ import HomePage from "./pages/user/HomePage";
 import WorkshopsPage from "./pages/user/WorkshopsPage";
 import LoginPage from "./pages/user/LoginPage";
 import RegisterPage from "./pages/user/RegisterPage";
-
+import WorkshopRegistrationPage from "./pages/user/WorkshopRegistrationPage";
 import { AuthProvider } from "./context/AuthContext";
 
 function PlaceholderPage({ title }) {
@@ -94,7 +94,7 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <PublicLayout>
-                  <PlaceholderPage title="Workshop Registration" />
+                  <WorkshopRegistrationPage />
                 </PublicLayout>
               </ProtectedRoute>
             }

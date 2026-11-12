@@ -93,6 +93,54 @@ async function getPublishedWorkshops(page = 1, limit = 10) {
     },
   };
 }
+async function getPublishedWorkshopById(workshopId) {
+  const workshop = await prisma.workshop.findFirst({
+    where: {
+      id: workshopId,
+      status: "PUBLISHED",
+      dateTime: {
+        gt: new Date(),
+      },
+    },
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      dateTime: true,
+      capacity: true,
+      createdAt: true,
+      _count: {
+        select: {
+          registrations: true,
+        },
+      },
+    },
+  });
+
+  if (!workshop) {
+    const error = new Error(
+      "Workshop not found or registration is no longer available."
+    );
+    error.statusCode = 404;
+    throw error;
+  }
+
+  const registrationCount = workshop._count.registrations;
+
+  return {
+    id: workshop.id,
+    title: workshop.title,
+    description: workshop.description,
+    dateTime: workshop.dateTime,
+    capacity: workshop.capacity,
+    createdAt: workshop.createdAt,
+    registrationCount,
+    availableSeats: Math.max(
+      workshop.capacity - registrationCount,
+      0
+    ),
+  };
+}
 
 async function updateWorkshop(workshopId, workshopData) {
   return prisma.$transaction(async (tx) => {
@@ -226,6 +274,7 @@ async function publishWorkshop(workshopId) {
 module.exports = {
   createWorkshop,
   getPublishedWorkshops,
+  getPublishedWorkshopById,
   updateWorkshop,
   cancelWorkshop,
   publishWorkshop,
