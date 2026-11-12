@@ -1,4 +1,8 @@
+
 const { prisma } = require("../db");
+const {
+  sendWorkshopConfirmationEmail,
+} = require("./email.service");
 
 function createError(message, statusCode) {
   const error = new Error(message);
@@ -10,9 +14,10 @@ async function registerForWorkshop(userId, registrationData) {
   const { workshopId, fullName, email, mobileNumber } = registrationData;
 
   try {
-    return await prisma.$transaction(async (tx) => {
-      // Lock the workshop row to prevent simultaneous
-      // registrations from exceeding its capacity.
+    // First, complete the database registration.
+    const result = await prisma.$transaction(async (tx) => {
+      // Lock the workshop row to prevent simultaneous registrations
+      // from exceeding its capacity.
       const lockedWorkshop = await tx.$queryRaw`
         SELECT "id"
         FROM "Workshop"
@@ -94,11 +99,34 @@ async function registerForWorkshop(userId, registrationData) {
 
       return {
         registration,
+        workshop,
         whatsappLink: workshop.whatsappLink,
         registrationCount: registrationCount + 1,
         availableSeats: workshop.capacity - registrationCount - 1,
       };
     });
+
+    // The transaction has committed. Now send the confirmation email.
+    console.log("STEP A: Registration saved. Sending confirmation email...");
+
+    try {
+      const emailResult = await sendWorkshopConfirmationEmail(
+        result.registration,
+        result.workshop
+      );
+
+      console.log("STEP B: Confirmation email sent:", emailResult);
+    } catch (emailError) {
+      console.error("STEP C: CONFIRMATION EMAIL FAILED:", emailError);
+    }
+
+    // Preserve the existing response structure.
+    return {
+      registration: result.registration,
+      whatsappLink: result.whatsappLink,
+      registrationCount: result.registrationCount,
+      availableSeats: result.availableSeats,
+    };
   } catch (error) {
     // Handle the database unique constraint as a backup.
     if (error.code === "P2002") {
