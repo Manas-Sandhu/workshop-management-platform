@@ -1,11 +1,13 @@
-
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import Navbar from "./components/layout/Navbar";
+import ProtectedRoute from "./components/common/ProtectedRoute";
+
 import HomePage from "./pages/user/HomePage";
 import WorkshopsPage from "./pages/user/WorkshopsPage";
 import LoginPage from "./pages/user/LoginPage";
 import RegisterPage from "./pages/user/RegisterPage";
+
 import { AuthProvider } from "./context/AuthContext";
 
 function PlaceholderPage({ title }) {
@@ -90,9 +92,11 @@ export default function App() {
           <Route
             path="/workshops/register"
             element={
-              <PublicLayout>
-                <PlaceholderPage title="Workshop Registration" />
-              </PublicLayout>
+              <ProtectedRoute>
+                <PublicLayout>
+                  <PlaceholderPage title="Workshop Registration" />
+                </PublicLayout>
+              </ProtectedRoute>
             }
           />
 
