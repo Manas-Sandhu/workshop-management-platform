@@ -156,9 +156,53 @@ async function cancelWorkshop(workshopId) {
   });
 }
 
+async function publishWorkshop(workshopId) {
+  return prisma.$transaction(async (tx) => {
+    // Lock the workshop row to prevent concurrent registration or cancellation.
+    const lockedWorkshop = await tx.$queryRaw`
+      SELECT "id"
+      FROM "Workshop"
+      WHERE "id" = ${workshopId}
+      FOR UPDATE
+    `;
+
+    if (lockedWorkshop.length === 0) {
+      const error = new Error("Workshop not found");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    const workshop = await tx.workshop.findUnique({
+      where: { id: workshopId },
+    });
+
+    if (workshop.status === "PUBLISHED") {
+      const error = new Error("Workshop is already published");
+      error.statusCode = 400;
+      throw error;
+    }
+
+    if (workshop.dateTime <= new Date()) {
+      const error = new Error(
+        "A workshop cannot be republished after its scheduled date has passed"
+      );
+      error.statusCode = 400;
+      throw error;
+    }
+
+    return tx.workshop.update({
+      where: { id: workshopId },
+      data: {
+        status: "PUBLISHED",
+      },
+    });
+  });
+}
+
 module.exports = {
   createWorkshop,
   getPublishedWorkshops,
   updateWorkshop,
   cancelWorkshop,
+  publishWorkshop,
 };
