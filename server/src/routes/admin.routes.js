@@ -4,7 +4,14 @@ const router = express.Router();
 const adminController = require("../controllers/admin.controller");
 const { authenticateAdmin } = require("../middleware/admin.middleware");
 
-router.post("/login", adminController.login);
+const { validateRequest } = require("../middleware/validation.middleware");
+const { loginSchema } = require("../validators/auth.validator");
+
+router.post(
+  "/login",
+  validateRequest(loginSchema),
+  adminController.login
+);
 
 router.post("/logout", adminController.logout);
 
