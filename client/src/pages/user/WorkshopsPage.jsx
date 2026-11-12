@@ -1,4 +1,3 @@
-
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -9,6 +8,7 @@ import {
   Users,
   RefreshCw,
   Sparkles,
+  Search,
 } from "lucide-react";
 
 import { getPublishedWorkshops } from "../../services/workshopService";
@@ -33,7 +33,6 @@ function WorkshopCard({ workshop }) {
 
   return (
     <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-navy/10 bg-white transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-navy/5">
-
       {/* Card header */}
       <div className="flex min-h-48 flex-col justify-between bg-navy p-7 text-offwhite">
         <div className="flex items-center justify-between">
@@ -41,49 +40,42 @@ function WorkshopCard({ workshop }) {
             Curated experience
           </span>
 
-          <span
-            className={`rounded-full border px-3 py-1 text-xs ${
-              isFull
-                ? "border-red-300/40 text-red-200"
-                : "border-white/20 text-white/80"
-            }`}
-          >
-            {isFull ? "Fully booked" : "Registration open"}
+          <span className="rounded-full border border-white/20 px-3 py-1 text-xs text-white/80">
+            {workshop.availableSeats} seats left
           </span>
         </div>
 
-        <h2 className="mt-8 font-display text-2xl font-semibold leading-snug">
-          {workshop.title}
-        </h2>
+        <div>
+          <p className="mb-3 flex items-center gap-2 text-xs text-white/50">
+            <CalendarDays size={14} />
+            {formatDate(workshop.dateTime)}
+          </p>
+
+          <h3 className="font-display text-2xl font-semibold leading-snug text-white">
+            {workshop.title}
+          </h3>
+        </div>
       </div>
 
-      {/* Card details */}
+      {/* Card content */}
       <div className="flex flex-1 flex-col p-7">
-        <p className="min-h-16 text-sm leading-7 text-navy/65">
-          {workshop.description ||
-            "Join us for an engaging learning experience."}
+        <p className="line-clamp-3 min-h-[72px] text-sm leading-7 text-navy/60">
+          {workshop.description || "More details coming soon."}
         </p>
 
-        <div className="mt-6 space-y-4 border-y border-navy/10 py-5">
-          <div className="flex items-center gap-3 text-sm text-navy/75">
-            <CalendarDays size={17} className="shrink-0 text-[#A68143]" />
-            {formatDate(workshop.dateTime)}
-          </div>
-
-          <div className="flex items-center gap-3 text-sm text-navy/75">
-            <Clock3 size={17} className="shrink-0 text-[#A68143]" />
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-navy/10 pt-5 text-sm text-navy/60">
+          <div className="flex items-center gap-2">
+            <Clock3 size={16} className="text-gold" />
             {formatTime(workshop.dateTime)}
           </div>
 
-          <div className="flex items-center gap-3 text-sm text-navy/75">
-            <Users size={17} className="shrink-0 text-[#A68143]" />
-            {isFull
-              ? "No seats available"
-              : `${workshop.availableSeats} seats available`}
+          <div className="flex items-center gap-2">
+            <Users size={16} className="text-gold" />
+            {workshop.registrationCount} registered
           </div>
         </div>
 
-        <div className="mt-auto pt-6">
+        <div className="mt-auto pt-7">
           {isFull ? (
             <button
               type="button"
@@ -122,12 +114,31 @@ export default function WorkshopsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const [searchInput, setSearchInput] = useState("");
+  const [search, setSearch] = useState("");
+  const [sort, setSort] = useState("soonest");
+
+  // Wait briefly after typing before searching.
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearch(searchInput.trim());
+      setPage(1);
+    }, 350);
+
+    return () => clearTimeout(timer);
+  }, [searchInput]);
+
   const fetchWorkshops = useCallback(async () => {
     try {
       setLoading(true);
       setError("");
 
-      const result = await getPublishedWorkshops(page);
+      const result = await getPublishedWorkshops(
+        page,
+        6,
+        search,
+        sort
+      );
 
       setWorkshops(result.workshops);
       setPagination(result.pagination);
@@ -139,7 +150,7 @@ export default function WorkshopsPage() {
     } finally {
       setLoading(false);
     }
-  }, [page]);
+  }, [page, search, sort]);
 
   useEffect(() => {
     fetchWorkshops();
@@ -147,7 +158,6 @@ export default function WorkshopsPage() {
 
   return (
     <main className="min-h-screen bg-offwhite">
-
       {/* Page hero */}
       <section className="bg-cream px-6 py-20 lg:px-10 lg:py-24">
         <div className="mx-auto max-w-7xl">
@@ -185,7 +195,7 @@ export default function WorkshopsPage() {
 
       {/* Workshop collection */}
       <section className="mx-auto max-w-7xl px-6 py-16 lg:px-10 lg:py-20">
-        <div className="mb-10 flex items-end justify-between">
+        <div className="mb-10 flex items-end justify-between gap-4">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#987438]">
               The collection
@@ -201,6 +211,38 @@ export default function WorkshopsPage() {
               {pagination.total} experiences
             </p>
           )}
+        </div>
+
+        {/* Search and sort */}
+        <div className="mb-8 flex flex-col gap-4 sm:flex-row">
+          <div className="relative flex-1">
+            <Search
+              size={18}
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-navy/40"
+            />
+
+            <input
+              type="search"
+              value={searchInput}
+              onChange={(event) => setSearchInput(event.target.value)}
+              placeholder="Search workshops..."
+              aria-label="Search workshops"
+              className="w-full rounded-xl border border-navy/15 bg-white py-3.5 pl-11 pr-4 text-sm text-navy outline-none transition placeholder:text-navy/40 focus:border-gold"
+            />
+          </div>
+
+          <select
+            value={sort}
+            onChange={(event) => {
+              setSort(event.target.value);
+              setPage(1);
+            }}
+            aria-label="Sort workshops"
+            className="rounded-xl border border-navy/15 bg-white px-4 py-3.5 text-sm text-navy outline-none focus:border-gold"
+          >
+            <option value="soonest">Soonest first</option>
+            <option value="latest">Latest first</option>
+          </select>
         </div>
 
         {/* Loading */}
@@ -232,12 +274,15 @@ export default function WorkshopsPage() {
         {!loading && !error && workshops.length === 0 && (
           <div className="rounded-2xl bg-cream px-6 py-20 text-center">
             <h3 className="font-display text-2xl font-semibold text-navy">
-              Something exciting is on its way.
+              {search
+                ? "No matching workshops found."
+                : "Something exciting is on its way."}
             </h3>
 
             <p className="mt-3 text-sm text-navy/60">
-              There are no upcoming published workshops at the moment.
-              Please check back soon.
+              {search
+                ? "Try another workshop title or keyword."
+                : "There are no upcoming published workshops at the moment. Please check back soon."}
             </p>
           </div>
         )}
@@ -260,9 +305,7 @@ export default function WorkshopsPage() {
                 <button
                   type="button"
                   disabled={page <= 1}
-                  onClick={() =>
-                    setPage((current) => current - 1)
-                  }
+                  onClick={() => setPage((current) => current - 1)}
                   className="rounded-full border border-navy/20 px-5 py-2.5 text-sm font-semibold text-navy disabled:opacity-30"
                 >
                   Previous
@@ -275,9 +318,7 @@ export default function WorkshopsPage() {
                 <button
                   type="button"
                   disabled={page >= pagination.totalPages}
-                  onClick={() =>
-                    setPage((current) => current + 1)
-                  }
+                  onClick={() => setPage((current) => current + 1)}
                   className="rounded-full border border-navy/20 px-5 py-2.5 text-sm font-semibold text-navy disabled:opacity-30"
                 >
                   Next
