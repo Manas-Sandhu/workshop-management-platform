@@ -1,10 +1,18 @@
 import apiFetch from "./api";
 
 // Fetch all published workshops.
-export async function getPublishedWorkshops(page = 1, limit = 9) {
+// Fetch published workshops with search, sorting, and pagination.
+export async function getPublishedWorkshops(
+  page = 1,
+  limit = 6,
+  search = "",
+  sort = "soonest"
+) {
   const query = new URLSearchParams({
     page: String(page),
     limit: String(limit),
+    search,
+    sort,
   });
 
   const response = await apiFetch(`/workshops?${query}`);
@@ -33,3 +41,4 @@ export async function registerForWorkshop(registrationData) {
 
   return response.data;
 }
+
