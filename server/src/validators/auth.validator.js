@@ -33,7 +33,16 @@ const loginSchema = z.object({
     .max(72, "Password cannot exceed 72 characters"),
 });
 
+const updateProfileSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(2, "Name must have at least 2 characters")
+    .max(100, "Name cannot exceed 100 characters"),
+});
+
 module.exports = {
   registerUserSchema,
   loginSchema,
+  updateProfileSchema,
 };

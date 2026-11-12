@@ -8,6 +8,7 @@ const { authenticateUser } = require("../middleware/auth.middleware");
 const {
   registerUserSchema,
   loginSchema,
+  updateProfileSchema,
 } = require("../validators/auth.validator");
 
 router.post(
@@ -22,6 +23,13 @@ router.post(
   authController.login
 );
 router.get("/me", authenticateUser, authController.me);
+
+router.patch(
+  "/profile",
+  authenticateUser,
+  validateRequest(updateProfileSchema),
+  authController.updateProfile
+);
 
 router.post(
   "/logout",

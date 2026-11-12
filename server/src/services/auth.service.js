@@ -90,7 +90,28 @@ async function loginUser({ email, password }) {
   };
 }
 
+async function updateUserProfile(userId, { name }) {
+  const updatedUser = await prisma.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      name: name.trim(),
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      createdAt: true,
+    },
+  });
+
+  return updatedUser;
+}
+
 module.exports = {
   registerUser,
   loginUser,
+  updateUserProfile,
 };
