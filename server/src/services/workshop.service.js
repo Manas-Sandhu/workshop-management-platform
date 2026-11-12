@@ -1,13 +1,8 @@
 const { prisma } = require("../db");
+const { clearCache } = require("../utils/cache");
 
 async function createWorkshop(adminId, workshopData) {
-  const {
-    title,
-    description,
-    dateTime,
-    capacity,
-    whatsappLink,
-  } = workshopData;
+  const { title, description, dateTime, capacity, whatsappLink } = workshopData;
 
   const workshop = await prisma.workshop.create({
     data: {
@@ -19,10 +14,10 @@ async function createWorkshop(adminId, workshopData) {
       createdById: adminId,
     },
   });
+  clearCache("admin:workshops");
 
   return workshop;
 }
-
 
 async function getPublishedWorkshops(page = 1, limit = 10, userId = null) {
   const skip = (page - 1) * limit;
@@ -82,10 +77,7 @@ async function getPublishedWorkshops(page = 1, limit = 10, userId = null) {
       capacity: workshop.capacity,
       createdAt: workshop.createdAt,
       registrationCount,
-      availableSeats: Math.max(
-        workshop.capacity - registrationCount,
-        0
-      ),
+      availableSeats: Math.max(workshop.capacity - registrationCount, 0),
     };
   });
 
@@ -99,6 +91,7 @@ async function getPublishedWorkshops(page = 1, limit = 10, userId = null) {
     },
   };
 }
+
 async function getPublishedWorkshopById(workshopId) {
   const workshop = await prisma.workshop.findFirst({
     where: {
@@ -125,7 +118,7 @@ async function getPublishedWorkshopById(workshopId) {
 
   if (!workshop) {
     const error = new Error(
-      "Workshop not found or registration is no longer available."
+      "Workshop not found or registration is no longer available.",
     );
     error.statusCode = 404;
     throw error;
@@ -141,15 +134,12 @@ async function getPublishedWorkshopById(workshopId) {
     capacity: workshop.capacity,
     createdAt: workshop.createdAt,
     registrationCount,
-    availableSeats: Math.max(
-      workshop.capacity - registrationCount,
-      0
-    ),
+    availableSeats: Math.max(workshop.capacity - registrationCount, 0),
   };
 }
 
 async function updateWorkshop(workshopId, workshopData) {
-  return prisma.$transaction(async (tx) => {
+  const result = await prisma.$transaction(async (tx) => {
     // Lock the workshop row before checking registrations or updating it.
     const lockedWorkshop = await tx.$queryRaw`
       SELECT "id"
@@ -180,7 +170,7 @@ async function updateWorkshop(workshopId, workshopData) {
       workshopData.capacity < existingWorkshop._count.registrations
     ) {
       const error = new Error(
-        "Capacity cannot be less than existing registrations"
+        "Capacity cannot be less than existing registrations",
       );
       error.statusCode = 400;
       throw error;
@@ -191,16 +181,19 @@ async function updateWorkshop(workshopId, workshopData) {
     if (updateData.dateTime !== undefined) {
       updateData.dateTime = new Date(updateData.dateTime);
     }
-
-    return tx.workshop.update({
+    const updatedWorkshop = await tx.workshop.update({
       where: { id: workshopId },
       data: updateData,
     });
+    clearCache("admin:workshops");
+    return updatedWorkshop;
   });
+  clearCache("admin:workshops");
+  return result;
 }
 
 async function cancelWorkshop(workshopId) {
-  return prisma.$transaction(async (tx) => {
+  const result = await prisma.$transaction(async (tx) => {
     // Lock the workshop row before checking or changing its status.
     const lockedWorkshop = await tx.$queryRaw`
       SELECT "id"
@@ -225,17 +218,21 @@ async function cancelWorkshop(workshopId) {
       throw error;
     }
 
-    return tx.workshop.update({
+    const updatedWorkshop = await tx.workshop.update({
       where: { id: workshopId },
       data: {
         status: "CANCELLED",
       },
     });
+    clearCache("admin:workshops");
+    return updatedWorkshop;
   });
+  clearCache("admin:workshops");
+  return result;
 }
 
 async function publishWorkshop(workshopId) {
-  return prisma.$transaction(async (tx) => {
+  const result = await prisma.$transaction(async (tx) => {
     // Lock the workshop row to prevent concurrent registration or cancellation.
     const lockedWorkshop = await tx.$queryRaw`
       SELECT "id"
@@ -262,19 +259,23 @@ async function publishWorkshop(workshopId) {
 
     if (workshop.dateTime <= new Date()) {
       const error = new Error(
-        "A workshop cannot be republished after its scheduled date has passed"
+        "A workshop cannot be republished after its scheduled date has passed",
       );
       error.statusCode = 400;
       throw error;
     }
 
-    return tx.workshop.update({
+    const updatedWorkshop = await tx.workshop.update({
       where: { id: workshopId },
       data: {
         status: "PUBLISHED",
       },
     });
+    clearCache("admin:workshops");
+    return updatedWorkshop;
   });
+  clearCache("admin:workshops");
+  return result;
 }
 
 module.exports = {

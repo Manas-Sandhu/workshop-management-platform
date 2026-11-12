@@ -1,6 +1,6 @@
 
 const { prisma } = require("../db");
-
+const { getCache, setCache } = require("../utils/cache");
 function createError(message, statusCode) {
   const error = new Error(message);
   error.statusCode = statusCode;
@@ -8,7 +8,18 @@ function createError(message, statusCode) {
 }
 
 // Admin dashboard: fetch all workshops with registration counts.
+// Admin dashboard: fetch all workshops with registration counts.
 async function getAllWorkshops() {
+  const cacheKey = "admin:workshops";
+
+  // 1. Check whether workshop data is already cached.
+  const cachedWorkshops = getCache(cacheKey);
+
+  if (cachedWorkshops !== null) {
+    return cachedWorkshops;
+  }
+
+  // 2. If not cached, fetch from PostgreSQL.
   const workshops = await prisma.workshop.findMany({
     select: {
       id: true,
@@ -30,7 +41,8 @@ async function getAllWorkshops() {
     },
   });
 
-  return workshops.map((workshop) => {
+  // 3. Format the response.
+  const formattedWorkshops = workshops.map((workshop) => {
     const registrationCount = workshop._count.registrations;
 
     return {
@@ -39,6 +51,7 @@ async function getAllWorkshops() {
       description: workshop.description,
       dateTime: workshop.dateTime,
       capacity: workshop.capacity,
+      whatsappLink: workshop.whatsappLink,
       status: workshop.status,
       createdAt: workshop.createdAt,
       registrationCount,
@@ -48,8 +61,12 @@ async function getAllWorkshops() {
       ),
     };
   });
-}
 
+  // 4. Save the result for 30 seconds.
+  setCache(cacheKey, formattedWorkshops);
+
+  return formattedWorkshops;
+}
 // All registrations, with search, filters, sorting and pagination.
 async function getAllRegistrations(query) {
   const page = Math.max(1, Number.parseInt(query.page, 10) || 1);
