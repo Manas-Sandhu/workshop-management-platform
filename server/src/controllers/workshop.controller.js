@@ -20,15 +20,26 @@ async function createWorkshop(req, res, next) {
 async function getPublishedWorkshops(req, res, next) {
   try {
     const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+
     const limit = Math.min(
       50,
       Math.max(1, parseInt(req.query.limit, 10) || 10)
     );
 
+    const search =
+      typeof req.query.search === "string"
+        ? req.query.search.trim()
+        : "";
+
+    const sort =
+      req.query.sort === "latest" ? "latest" : "soonest";
+
     const result = await workshopService.getPublishedWorkshops(
       page,
       limit,
-      req.user?.id || null
+      req.user?.id || null,
+      search,
+      sort
     );
 
     return res.status(200).json({

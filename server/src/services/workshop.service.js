@@ -19,7 +19,13 @@ async function createWorkshop(adminId, workshopData) {
   return workshop;
 }
 
-async function getPublishedWorkshops(page = 1, limit = 10, userId = null) {
+async function getPublishedWorkshops(
+  page = 1,
+  limit = 10,
+  userId = null,
+  search = "",
+  sort = "soonest"
+) {
   const skip = (page - 1) * limit;
 
   const where = {
@@ -29,7 +35,27 @@ async function getPublishedWorkshops(page = 1, limit = 10, userId = null) {
     },
   };
 
-  // Exclude workshops already registered by this user.
+  // Search across workshop titles and descriptions.
+  const searchTerm = search.trim();
+
+  if (searchTerm) {
+    where.OR = [
+      {
+        title: {
+          contains: searchTerm,
+          mode: "insensitive",
+        },
+      },
+      {
+        description: {
+          contains: searchTerm,
+          mode: "insensitive",
+        },
+      },
+    ];
+  }
+
+  // Preserve the existing user-specific exclusion.
   if (userId) {
     where.registrations = {
       none: {
@@ -37,6 +63,9 @@ async function getPublishedWorkshops(page = 1, limit = 10, userId = null) {
       },
     };
   }
+
+  // Only allow the two supported sorting directions.
+  const sortOrder = sort === "latest" ? "desc" : "asc";
 
   const [workshops, total] = await Promise.all([
     prisma.workshop.findMany({
@@ -55,7 +84,7 @@ async function getPublishedWorkshops(page = 1, limit = 10, userId = null) {
         },
       },
       orderBy: {
-        dateTime: "asc",
+        dateTime: sortOrder,
       },
       skip,
       take: limit,
@@ -77,7 +106,10 @@ async function getPublishedWorkshops(page = 1, limit = 10, userId = null) {
       capacity: workshop.capacity,
       createdAt: workshop.createdAt,
       registrationCount,
-      availableSeats: Math.max(workshop.capacity - registrationCount, 0),
+      availableSeats: Math.max(
+        workshop.capacity - registrationCount,
+        0
+      ),
     };
   });
 
