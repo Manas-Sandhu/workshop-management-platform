@@ -23,6 +23,7 @@ async function createWorkshop(adminId, workshopData) {
   return workshop;
 }
 
+
 async function getPublishedWorkshops(page = 1, limit = 10) {
   const skip = (page - 1) * limit;
 
@@ -41,6 +42,11 @@ async function getPublishedWorkshops(page = 1, limit = 10) {
         dateTime: true,
         capacity: true,
         createdAt: true,
+        _count: {
+          select: {
+            registrations: true,
+          },
+        },
       },
       orderBy: {
         dateTime: "asc",
@@ -59,8 +65,26 @@ async function getPublishedWorkshops(page = 1, limit = 10) {
     }),
   ]);
 
+  const formattedWorkshops = workshops.map((workshop) => {
+    const registrationCount = workshop._count.registrations;
+
+    return {
+      id: workshop.id,
+      title: workshop.title,
+      description: workshop.description,
+      dateTime: workshop.dateTime,
+      capacity: workshop.capacity,
+      createdAt: workshop.createdAt,
+      registrationCount,
+      availableSeats: Math.max(
+        workshop.capacity - registrationCount,
+        0
+      ),
+    };
+  });
+
   return {
-    workshops,
+    workshops: formattedWorkshops,
     pagination: {
       total,
       page,
