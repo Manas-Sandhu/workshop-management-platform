@@ -1,14 +1,23 @@
-
 @import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap");
+
+@theme {
+  --color-navy: #142933;
+  --color-gold: #CBA765;
+  --color-cream: #F4F0EA;
+  --color-offwhite: #FBFCFC;
+
+  --font-sans: "DM Sans", sans-serif;
+  --font-display: "Manrope", sans-serif;
+}
 
 :root {
-  font-family: Inter, sans-serif;
+  font-family: "DM Sans", sans-serif;
   color: #142933;
   background: #FBFCFC;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
 * {
@@ -18,5 +27,24 @@
 body {
   margin: 0;
   min-width: 320px;
-  min-height: 100vh;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+a {
+  text-decoration: none;
+}
+
+::selection {
+  background: #CBA765;
+  color: #142933;
 }

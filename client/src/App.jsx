@@ -1,122 +1,116 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import Navbar from "./components/layout/Navbar";
+import HomePage from "./pages/user/HomePage";
 
-function App() {
-  const [count, setCount] = useState(0)
-
+function PlaceholderPage({ title }) {
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+    <main className="min-h-[70vh] bg-offwhite px-6 py-24">
+      <div className="mx-auto max-w-7xl">
+        <p className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-[#987438]">
+          Workshop Platform
+        </p>
+        <h1 className="font-display text-4xl font-semibold text-navy md:text-5xl">
+          {title}
+        </h1>
+        <p className="mt-5 text-navy/60">
+          This page will be implemented in the next development stages.
+        </p>
+      </div>
+    </main>
+  );
 }
 
-export default App
+function PublicLayout({ children }) {
+  return (
+    <>
+      <Navbar />
+      {children}
+    </>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <PublicLayout>
+              <HomePage />
+            </PublicLayout>
+          }
+        />
+
+        <Route
+          path="/workshops"
+          element={
+            <PublicLayout>
+              <PlaceholderPage title="Explore Workshops" />
+            </PublicLayout>
+          }
+        />
+
+        <Route
+          path="/my-workshops"
+          element={
+            <PublicLayout>
+              <PlaceholderPage title="My Workshops" />
+            </PublicLayout>
+          }
+        />
+
+        <Route
+          path="/login"
+          element={
+            <PublicLayout>
+              <PlaceholderPage title="Log In" />
+            </PublicLayout>
+          }
+        />
+
+        <Route
+          path="/register"
+          element={
+            <PublicLayout>
+              <PlaceholderPage title="Create an Account" />
+            </PublicLayout>
+          }
+        />
+
+        <Route
+          path="/workshops/register"
+          element={
+            <PublicLayout>
+              <PlaceholderPage title="Workshop Registration" />
+            </PublicLayout>
+          }
+        />
+
+        <Route
+          path="/admin/login"
+          element={<PlaceholderPage title="Admin Login" />}
+        />
+
+        <Route
+          path="/admin/dashboard"
+          element={<PlaceholderPage title="Admin Dashboard" />}
+        />
+
+        <Route
+          path="/admin/workshops/:workshopId/registrations"
+          element={<PlaceholderPage title="Workshop Registrations" />}
+        />
+
+        <Route
+          path="*"
+          element={
+            <PublicLayout>
+              <PlaceholderPage title="Page Not Found" />
+            </PublicLayout>
+          }
+        />
+      </Routes>
+    </BrowserRouter>
+  );
+}
