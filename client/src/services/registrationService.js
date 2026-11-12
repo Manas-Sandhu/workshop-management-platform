@@ -1,10 +1,11 @@
 import apiFetch from "./api";
 
 const CACHE_DURATION = 60 * 1000;
+
 const registrationCache = new Map();
 const pendingRequests = new Map();
 
-// Clear cached registrations for a specific user.
+// Clear cached registrations.
 export function clearMyRegistrationsCache(userId) {
   if (userId) {
     for (const key of registrationCache.keys()) {
@@ -18,10 +19,12 @@ export function clearMyRegistrationsCache(userId) {
         pendingRequests.delete(key);
       }
     }
-  } else {
-    registrationCache.clear();
-    pendingRequests.clear();
+
+    return;
   }
+
+  registrationCache.clear();
+  pendingRequests.clear();
 }
 
 // Register for a workshop.
@@ -41,7 +44,6 @@ export async function registerForWorkshop({
     }),
   });
 
-  // Clear registration cache after successful registration.
   clearMyRegistrationsCache();
 
   return response;
