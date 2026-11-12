@@ -6,6 +6,8 @@ import {
   Routes,
 } from "react-router-dom";
 
+import ProfilePage from "./pages/user/ProfilePage";
+
 import WorkshopRegistrationsPage from "./pages/admin/WorkshopRegistrationsPage";
 
 import Navbar from "./components/layout/Navbar";
@@ -109,6 +111,17 @@ export default function App() {
               <PublicLayout>
                 <MyWorkshopsPage />
               </PublicLayout>
+            }
+          />
+
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <PublicLayout>
+                  <ProfilePage />
+                </PublicLayout>
+              </ProtectedRoute>
             }
           />
 

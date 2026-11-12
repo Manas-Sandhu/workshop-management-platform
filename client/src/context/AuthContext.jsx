@@ -10,6 +10,7 @@ import {
   getCurrentUser,
   loginUser,
   logoutUser,
+  updateUserProfile,
 } from "../services/authService";
 
 const AuthContext = createContext(null);
@@ -57,16 +58,23 @@ export function AuthProvider({ children }) {
     setUser(null);
   }
 
+  async function updateProfile(profileData) {
+  const response = await updateUserProfile(profileData);
+  setUser(response.data.user);
+  return response.data.user;
+  }
+
   return (
-    <AuthContext.Provider
+        <AuthContext.Provider
       value={{
         user,
         isAuthenticated: Boolean(user),
         authLoading,
         login,
         logout,
+        updateProfile,
       }}
-    >
+    > 
       {children}
     </AuthContext.Provider>
   );

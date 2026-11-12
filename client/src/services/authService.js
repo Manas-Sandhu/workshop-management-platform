@@ -24,3 +24,11 @@ export async function logoutUser() {
 export async function getCurrentUser() {
   return apiFetch("/auth/me");
 }
+
+// Update the logged-in user's profile.
+export async function updateUserProfile(profileData) {
+  return apiFetch("/auth/profile", {
+    method: "PATCH",
+    body: JSON.stringify(profileData),
+  });
+}

@@ -82,4 +82,29 @@ async function me(req, res) {
   });
 }
 
-module.exports = { register, login, logout,me };
+async function updateProfile(req, res, next) {
+  try {
+    const updatedUser = await authService.updateUserProfile(
+      req.user.id,
+      req.body
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Profile updated successfully",
+      data: {
+        user: updatedUser,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+module.exports = {
+  register,
+  login,
+  logout,
+  me,
+  updateProfile,
+};
