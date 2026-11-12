@@ -161,6 +161,7 @@ async function getMyRegistrations(userId, page = 1, limit = 10) {
             dateTime: true,
             capacity: true,
             status: true,
+            whatsappLink: true,
           },
         },
       },
