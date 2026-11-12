@@ -1,10 +1,6 @@
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
-import {
-  BrowserRouter,
-  Navigate,
-  Route,
-  Routes,
-} from "react-router-dom";
+import WorkshopRegistrationsPage from "./pages/admin/WorkshopRegistrationsPage";
 
 import Navbar from "./components/layout/Navbar";
 import ProtectedRoute from "./components/common/ProtectedRoute";
@@ -58,27 +54,47 @@ export default function App() {
           <Routes>
             <Route
               path="/"
-              element={<PublicLayout><HomePage /></PublicLayout>}
+              element={
+                <PublicLayout>
+                  <HomePage />
+                </PublicLayout>
+              }
             />
 
             <Route
               path="/workshops"
-              element={<PublicLayout><WorkshopsPage /></PublicLayout>}
+              element={
+                <PublicLayout>
+                  <WorkshopsPage />
+                </PublicLayout>
+              }
             />
 
             <Route
               path="/login"
-              element={<PublicLayout><LoginPage /></PublicLayout>}
+              element={
+                <PublicLayout>
+                  <LoginPage />
+                </PublicLayout>
+              }
             />
 
             <Route
               path="/register"
-              element={<PublicLayout><RegisterPage /></PublicLayout>}
+              element={
+                <PublicLayout>
+                  <RegisterPage />
+                </PublicLayout>
+              }
             />
 
             <Route
               path="/my-workshops"
-              element={<PublicLayout><MyWorkshopsPage /></PublicLayout>}
+              element={
+                <PublicLayout>
+                  <MyWorkshopsPage />
+                </PublicLayout>
+              }
             />
 
             <Route
@@ -122,7 +138,7 @@ export default function App() {
               path="/admin/workshops/:workshopId/registrations"
               element={
                 <AdminProtectedRoute>
-                  <PlaceholderPage title="Workshop Registrations" />
+                  <WorkshopRegistrationsPage />
                 </AdminProtectedRoute>
               }
             />
