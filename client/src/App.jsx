@@ -9,6 +9,7 @@ import LoginPage from "./pages/user/LoginPage";
 import RegisterPage from "./pages/user/RegisterPage";
 import WorkshopRegistrationPage from "./pages/user/WorkshopRegistrationPage";
 import { AuthProvider } from "./context/AuthContext";
+import MyWorkshopsPage from "./pages/user/MyWorkshopsPage";
 
 function PlaceholderPage({ title }) {
   return (
@@ -84,7 +85,7 @@ export default function App() {
             path="/my-workshops"
             element={
               <PublicLayout>
-                <PlaceholderPage title="My Workshops" />
+                <MyWorkshopsPage />
               </PublicLayout>
             }
           />

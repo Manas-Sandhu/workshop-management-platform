@@ -59,5 +59,44 @@ async function authenticateUser(req, res, next) {
     next(error);
   }
 }
+async function optionalAuthenticateUser(req, res, next) {
+  try {
+    const token = req.cookies?.sessionToken;
 
-module.exports = { authenticateUser };
+    if (!token) {
+      return next();
+    }
+
+    const tokenHash = crypto
+      .createHash("sha256")
+      .update(token)
+      .digest("hex");
+
+    const session = await prisma.refreshToken.findUnique({
+      where: { tokenHash },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+          },
+        },
+      },
+    });
+
+    if (
+      session &&
+      session.expiresAt > new Date() &&
+      session.user.role === "USER"
+    ) {
+      req.user = session.user;
+    }
+
+    return next();
+  } catch (error) {
+    next(error);
+  }
+}
+module.exports = { authenticateUser,optionalAuthenticateUser };

@@ -1,3 +1,4 @@
+
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
@@ -37,11 +38,10 @@ app.use("/api/v1/admin/workshops", adminWorkshopRoutes);
 // Admin registration dashboard routes.
 app.use("/api/v1/admin", adminRegistrationRoutes);
 
-// Public workshop listing.
-app.use("/api/v1/workshops", workshopRoutes);
-
-// User workshop registration.
 app.use("/api/v1/workshops", registrationRoutes);
+
+// Public workshop listing and individual workshop routes.
+app.use("/api/v1/workshops", workshopRoutes);
 
 const { errorHandler } = require("./middleware/error.middleware");
 

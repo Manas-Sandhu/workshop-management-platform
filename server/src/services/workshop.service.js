@@ -24,17 +24,28 @@ async function createWorkshop(adminId, workshopData) {
 }
 
 
-async function getPublishedWorkshops(page = 1, limit = 10) {
+async function getPublishedWorkshops(page = 1, limit = 10, userId = null) {
   const skip = (page - 1) * limit;
+
+  const where = {
+    status: "PUBLISHED",
+    dateTime: {
+      gte: new Date(),
+    },
+  };
+
+  // Exclude workshops already registered by this user.
+  if (userId) {
+    where.registrations = {
+      none: {
+        userId,
+      },
+    };
+  }
 
   const [workshops, total] = await Promise.all([
     prisma.workshop.findMany({
-      where: {
-        status: "PUBLISHED",
-        dateTime: {
-          gte: new Date(),
-        },
-      },
+      where,
       select: {
         id: true,
         title: true,
@@ -56,12 +67,7 @@ async function getPublishedWorkshops(page = 1, limit = 10) {
     }),
 
     prisma.workshop.count({
-      where: {
-        status: "PUBLISHED",
-        dateTime: {
-          gte: new Date(),
-        },
-      },
+      where,
     }),
   ]);
 
