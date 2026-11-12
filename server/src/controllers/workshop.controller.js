@@ -40,6 +40,21 @@ async function getPublishedWorkshops(req, res, next) {
     next(error);
   }
 }
+async function getPublishedWorkshopById(req, res, next) {
+  try {
+    const workshop = await workshopService.getPublishedWorkshopById(
+      req.params.workshopId
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Workshop fetched successfully",
+      data: workshop,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
 
 async function updateWorkshop(req, res, next) {
   try {
@@ -93,6 +108,7 @@ async function publishWorkshop(req, res, next) {
 module.exports = {
   createWorkshop,
   getPublishedWorkshops,
+  getPublishedWorkshopById,
   updateWorkshop,
   cancelWorkshop,
   publishWorkshop,

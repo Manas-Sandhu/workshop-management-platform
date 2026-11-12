@@ -3,7 +3,10 @@ const router = express.Router();
 
 const workshopController = require("../controllers/workshop.controller");
 
-// Public route: anyone can view published workshops.
+// Public route: fetch all published workshops.
 router.get("/", workshopController.getPublishedWorkshops);
+
+// Public route: fetch one published workshop.
+router.get("/:workshopId", workshopController.getPublishedWorkshopById);
 
 module.exports = router;
