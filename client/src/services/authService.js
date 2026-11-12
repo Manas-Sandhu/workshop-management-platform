@@ -1,3 +1,4 @@
+
 import apiFetch from "./api";
 
 export async function registerUser({ name, email, password }) {
@@ -18,4 +19,8 @@ export async function logoutUser() {
   return apiFetch("/auth/logout", {
     method: "POST",
   });
+}
+
+export async function getCurrentUser() {
+  return apiFetch("/auth/me");
 }
