@@ -156,10 +156,12 @@ export default function MyWorkshopsPage() {
   const [activeTab, setActiveTab] = useState("all");
   const [refreshKey, setRefreshKey] = useState(0);
 
+  const userId = user?.id || "guest";
+
   useEffect(() => {
     if (authLoading) return;
 
-    if (!isAuthenticated || !user?.id) {
+    if (!isAuthenticated) {
       setRegistrations([]);
       setPagination(null);
       setLoading(false);
@@ -176,8 +178,7 @@ export default function MyWorkshopsPage() {
         const result = await getMyRegistrations(
           page,
           10,
-          user.id,
-          refreshKey > 0
+          userId
         );
 
         if (active) {
@@ -203,7 +204,18 @@ export default function MyWorkshopsPage() {
     return () => {
       active = false;
     };
-  }, [page, refreshKey, isAuthenticated, authLoading, user?.id]);
+  }, [
+    page,
+    refreshKey,
+    userId,
+    isAuthenticated,
+    authLoading,
+  ]);
+
+  function handleRefresh() {
+    clearMyRegistrationsCache(userId);
+    setRefreshKey((current) => current + 1);
+  }
 
   const filteredRegistrations = useMemo(() => {
     if (activeTab === "upcoming") {
@@ -229,14 +241,6 @@ export default function MyWorkshopsPage() {
 
     return registrations;
   }, [registrations, activeTab]);
-
-  function handleRefresh() {
-    if (user?.id) {
-      clearMyRegistrationsCache(user.id);
-    }
-
-    setRefreshKey((current) => current + 1);
-  }
 
   if (authLoading) {
     return (
