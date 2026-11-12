@@ -1,4 +1,3 @@
-
 const { Resend } = require("resend");
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -30,16 +29,16 @@ async function sendWorkshopConfirmationEmail(registration, workshop) {
     subject: "Workshop Registration Confirmed!",
     text: `Hi ${registration.fullName},
 
-Your registration for ${workshop.title} has been confirmed!
+        Your registration for ${workshop.title} has been confirmed!
 
-Workshop: ${workshop.title}
-Date and Time: ${formattedDate} (IST)
-Registration ID: ${registration.id}
+        Workshop: ${workshop.title}
+        Date and Time: ${formattedDate} (IST)
+        Registration ID: ${registration.id}
 
-Thank you for registering. We look forward to seeing you!
+        Thank you for registering. We look forward to seeing you!
 
-Regards,
-Workshop Team`,
+        Regards,
+        Workshop Team`,
   });
 
   if (error) {
