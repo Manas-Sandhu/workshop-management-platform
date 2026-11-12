@@ -139,7 +139,57 @@ async function registerForWorkshop(userId, registrationData) {
     throw error;
   }
 }
+async function getMyRegistrations(userId, page = 1, limit = 10) {
+  const skip = (page - 1) * limit;
+
+  const [registrations, total] = await Promise.all([
+    prisma.registration.findMany({
+      where: {
+        userId,
+      },
+      select: {
+        id: true,
+        fullName: true,
+        email: true,
+        mobileNumber: true,
+        registeredAt: true,
+        workshop: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            dateTime: true,
+            capacity: true,
+            status: true,
+          },
+        },
+      },
+      orderBy: {
+        registeredAt: "desc",
+      },
+      skip,
+      take: limit,
+    }),
+
+    prisma.registration.count({
+      where: {
+        userId,
+      },
+    }),
+  ]);
+
+  return {
+    registrations,
+    pagination: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
+}
 
 module.exports = {
   registerForWorkshop,
+  getMyRegistrations,
 };
