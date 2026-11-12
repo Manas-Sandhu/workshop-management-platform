@@ -1,4 +1,10 @@
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import {
+  BrowserRouter,
+  Navigate,
+  Outlet,
+  Route,
+  Routes,
+} from "react-router-dom";
 
 import WorkshopRegistrationsPage from "./pages/admin/WorkshopRegistrationsPage";
 
@@ -46,78 +52,88 @@ function PublicLayout({ children }) {
   );
 }
 
+// Admin authentication is mounted only inside the admin section.
+function AdminLayout() {
+  return (
+    <AdminAuthProvider>
+      <Outlet />
+    </AdminAuthProvider>
+  );
+}
+
 export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <AdminAuthProvider>
-          <Routes>
-            <Route
-              path="/"
-              element={
+        <Routes>
+          {/* Public routes */}
+          <Route
+            path="/"
+            element={
+              <PublicLayout>
+                <HomePage />
+              </PublicLayout>
+            }
+          />
+
+          <Route
+            path="/workshops"
+            element={
+              <PublicLayout>
+                <WorkshopsPage />
+              </PublicLayout>
+            }
+          />
+
+          <Route
+            path="/login"
+            element={
+              <PublicLayout>
+                <LoginPage />
+              </PublicLayout>
+            }
+          />
+
+          <Route
+            path="/register"
+            element={
+              <PublicLayout>
+                <RegisterPage />
+              </PublicLayout>
+            }
+          />
+
+          <Route
+            path="/my-workshops"
+            element={
+              <PublicLayout>
+                <MyWorkshopsPage />
+              </PublicLayout>
+            }
+          />
+
+          <Route
+            path="/workshops/register"
+            element={
+              <ProtectedRoute>
                 <PublicLayout>
-                  <HomePage />
+                  <WorkshopRegistrationPage />
                 </PublicLayout>
-              }
-            />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Admin routes */}
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route path="login" element={<AdminLoginPage />} />
 
             <Route
-              path="/workshops"
-              element={
-                <PublicLayout>
-                  <WorkshopsPage />
-                </PublicLayout>
-              }
-            />
-
-            <Route
-              path="/login"
-              element={
-                <PublicLayout>
-                  <LoginPage />
-                </PublicLayout>
-              }
-            />
-
-            <Route
-              path="/register"
-              element={
-                <PublicLayout>
-                  <RegisterPage />
-                </PublicLayout>
-              }
-            />
-
-            <Route
-              path="/my-workshops"
-              element={
-                <PublicLayout>
-                  <MyWorkshopsPage />
-                </PublicLayout>
-              }
-            />
-
-            <Route
-              path="/workshops/register"
-              element={
-                <ProtectedRoute>
-                  <PublicLayout>
-                    <WorkshopRegistrationPage />
-                  </PublicLayout>
-                </ProtectedRoute>
-              }
-            />
-
-            {/* Admin routes */}
-            <Route path="/admin/login" element={<AdminLoginPage />} />
-
-            <Route
-              path="/admin/dashboard"
+              path="dashboard"
               element={<Navigate to="/admin/workshops" replace />}
             />
 
             <Route
-              path="/admin/workshops"
+              path="workshops"
               element={
                 <AdminProtectedRoute>
                   <AdminWorkshopsPage />
@@ -126,24 +142,25 @@ export default function App() {
             />
 
             <Route
-              path="/admin/workshops/:workshopId/registrations"
+              path="workshops/:workshopId/registrations"
               element={
                 <AdminProtectedRoute>
                   <WorkshopRegistrationsPage />
                 </AdminProtectedRoute>
               }
             />
+          </Route>
 
-            <Route
-              path="*"
-              element={
-                <PublicLayout>
-                  <PlaceholderPage title="Page Not Found" />
-                </PublicLayout>
-              }
-            />
-          </Routes>
-        </AdminAuthProvider>
+          {/* Fallback route */}
+          <Route
+            path="*"
+            element={
+              <PublicLayout>
+                <PlaceholderPage title="Page Not Found" />
+              </PublicLayout>
+            }
+          />
+        </Routes>
       </AuthProvider>
     </BrowserRouter>
   );
