@@ -9,8 +9,7 @@ const {
   updateWorkshopSchema,
 } = require("../validators/workshop.validator");
 
-// All routes in this file require admin authentication.
-
+// All routes require admin authentication.
 router.post(
   "/",
   authenticateAdmin,
@@ -29,6 +28,12 @@ router.patch(
   "/:id/cancel",
   authenticateAdmin,
   workshopController.cancelWorkshop
+);
+
+router.patch(
+  "/:id/publish",
+  authenticateAdmin,
+  workshopController.publishWorkshop
 );
 
 module.exports = router;
