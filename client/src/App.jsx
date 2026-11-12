@@ -1,6 +1,9 @@
+
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+
 import Navbar from "./components/layout/Navbar";
 import HomePage from "./pages/user/HomePage";
+import WorkshopsPage from "./pages/user/WorkshopsPage";
 
 function PlaceholderPage({ title }) {
   return (
@@ -9,9 +12,11 @@ function PlaceholderPage({ title }) {
         <p className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-[#987438]">
           Workshop Platform
         </p>
+
         <h1 className="font-display text-4xl font-semibold text-navy md:text-5xl">
           {title}
         </h1>
+
         <p className="mt-5 text-navy/60">
           This page will be implemented in the next development stages.
         </p>
@@ -42,11 +47,12 @@ export default function App() {
           }
         />
 
+        {/* Actual workshops page */}
         <Route
           path="/workshops"
           element={
             <PublicLayout>
-              <PlaceholderPage title="Explore Workshops" />
+              <WorkshopsPage />
             </PublicLayout>
           }
         />
