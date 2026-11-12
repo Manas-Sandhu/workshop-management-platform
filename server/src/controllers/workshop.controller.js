@@ -27,7 +27,8 @@ async function getPublishedWorkshops(req, res, next) {
 
     const result = await workshopService.getPublishedWorkshops(
       page,
-      limit
+      limit,
+      req.user?.id || null
     );
 
     return res.status(200).json({

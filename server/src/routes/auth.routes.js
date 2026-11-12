@@ -4,7 +4,7 @@ const router = express.Router();
 
 const authController = require("../controllers/auth.controller");
 const { validateRequest } = require("../middleware/validation.middleware");
-
+const { authenticateUser } = require("../middleware/auth.middleware");
 const {
   registerUserSchema,
   loginSchema,
@@ -21,6 +21,7 @@ router.post(
   validateRequest(loginSchema),
   authController.login
 );
+router.get("/me", authenticateUser, authController.me);
 
 router.post(
   "/logout",

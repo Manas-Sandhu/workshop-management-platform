@@ -72,5 +72,14 @@ async function logout(req, res, next) {
     next(error);
   }
 }
+async function me(req, res) {
+  return res.status(200).json({
+    success: true,
+    message: "Current user fetched successfully",
+    data: {
+      user: req.user,
+    },
+  });
+}
 
-module.exports = { register, login, logout };
+module.exports = { register, login, logout,me };
