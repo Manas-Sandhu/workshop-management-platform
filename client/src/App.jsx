@@ -1,3 +1,4 @@
+
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import Navbar from "./components/layout/Navbar";
@@ -5,6 +6,7 @@ import HomePage from "./pages/user/HomePage";
 import WorkshopsPage from "./pages/user/WorkshopsPage";
 import LoginPage from "./pages/user/LoginPage";
 import RegisterPage from "./pages/user/RegisterPage";
+import { AuthProvider } from "./context/AuthContext";
 
 function PlaceholderPage({ title }) {
   return (
@@ -13,9 +15,11 @@ function PlaceholderPage({ title }) {
         <p className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-[#987438]">
           Workshop Platform
         </p>
+
         <h1 className="font-display text-4xl font-semibold text-navy md:text-5xl">
           {title}
         </h1>
+
         <p className="mt-5 text-navy/60">
           This page will be implemented in the next development stages.
         </p>
@@ -36,85 +40,87 @@ function PublicLayout({ children }) {
 export default function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <PublicLayout>
-              <HomePage />
-            </PublicLayout>
-          }
-        />
+      <AuthProvider>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <PublicLayout>
+                <HomePage />
+              </PublicLayout>
+            }
+          />
 
-        <Route
-          path="/workshops"
-          element={
-            <PublicLayout>
-              <WorkshopsPage />
-            </PublicLayout>
-          }
-        />
+          <Route
+            path="/workshops"
+            element={
+              <PublicLayout>
+                <WorkshopsPage />
+              </PublicLayout>
+            }
+          />
 
-        <Route
-          path="/login"
-          element={
-            <PublicLayout>
-              <LoginPage />
-            </PublicLayout>
-          }
-        />
+          <Route
+            path="/login"
+            element={
+              <PublicLayout>
+                <LoginPage />
+              </PublicLayout>
+            }
+          />
 
-        <Route
-          path="/register"
-          element={
-            <PublicLayout>
-              <RegisterPage />
-            </PublicLayout>
-          }
-        />
+          <Route
+            path="/register"
+            element={
+              <PublicLayout>
+                <RegisterPage />
+              </PublicLayout>
+            }
+          />
 
-        <Route
-          path="/my-workshops"
-          element={
-            <PublicLayout>
-              <PlaceholderPage title="My Workshops" />
-            </PublicLayout>
-          }
-        />
+          <Route
+            path="/my-workshops"
+            element={
+              <PublicLayout>
+                <PlaceholderPage title="My Workshops" />
+              </PublicLayout>
+            }
+          />
 
-        <Route
-          path="/workshops/register"
-          element={
-            <PublicLayout>
-              <PlaceholderPage title="Workshop Registration" />
-            </PublicLayout>
-          }
-        />
+          <Route
+            path="/workshops/register"
+            element={
+              <PublicLayout>
+                <PlaceholderPage title="Workshop Registration" />
+              </PublicLayout>
+            }
+          />
 
-        <Route
-          path="/admin/login"
-          element={<PlaceholderPage title="Admin Login" />}
-        />
+          <Route
+            path="/admin/login"
+            element={<PlaceholderPage title="Admin Login" />}
+          />
 
-        <Route
-          path="/admin/dashboard"
-          element={<PlaceholderPage title="Admin Dashboard" />}
-        />
+          <Route
+            path="/admin/dashboard"
+            element={<PlaceholderPage title="Admin Dashboard" />}
+          />
 
-        <Route
-          path="/admin/workshops/:workshopId/registrations"
-          element={<PlaceholderPage title="Workshop Registrations" />}
-        />
+          <Route
+            path="/admin/workshops/:workshopId/registrations"
+            element={<PlaceholderPage title="Workshop Registrations" />}
+          />
 
-        <Route
-          path="*"
-          element={
-            <PublicLayout>
-              <PlaceholderPage title="Page Not Found" />
-            </PublicLayout>
-          }
-        />
-      </Routes>
+          <Route
+            path="*"
+            element={
+              <PublicLayout>
+                <PlaceholderPage title="Page Not Found" />
+              </PublicLayout>
+            }
+          />
+        </Routes>
+      </AuthProvider>
     </BrowserRouter>
   );
 }

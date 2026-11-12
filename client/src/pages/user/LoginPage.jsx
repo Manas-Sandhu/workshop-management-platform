@@ -2,11 +2,13 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ArrowRight, Eye, EyeOff } from "lucide-react";
-import { loginUser } from "../../services/authService";
+import { useAuth } from "../../context/AuthContext";
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
+
+  const { login } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -14,7 +16,8 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const returnTo = location.state?.from || "/my-workshops";
+  // Preserve the original destination if the user was redirected to login.
+  const returnTo = location.state?.from || "/workshops";
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -22,7 +25,10 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      await loginUser({ email, password });
+      await login({ email, password });
+
+      // Normal login goes to Explore Workshops.
+      // Workshop registration redirects return to their original destination.
       navigate(returnTo, { replace: true });
     } catch (err) {
       setError(err.message || "Unable to log in. Please try again.");
@@ -43,9 +49,11 @@ export default function LoginPage() {
             <p className="mb-5 text-xs font-bold uppercase tracking-[0.2em] text-gold">
               Welcome back
             </p>
+
             <h1 className="font-display text-4xl font-semibold leading-tight md:text-5xl">
               Your next inspiring experience starts here.
             </h1>
+
             <p className="mt-6 leading-8 text-white/60">
               Sign in to manage your registrations and continue your learning
               journey.
@@ -62,18 +70,27 @@ export default function LoginPage() {
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#987438]">
               Your account
             </p>
+
             <h2 className="mt-3 font-display text-3xl font-semibold text-navy">
               Log in
             </h2>
+
             <p className="mt-3 text-sm leading-7 text-navy/55">
               Enter your details to access your account.
             </p>
+
+            {location.state?.message && (
+              <p className="mt-5 rounded-xl bg-green-50 p-3 text-sm text-green-700">
+                {location.state.message}
+              </p>
+            )}
 
             <form onSubmit={handleSubmit} className="mt-9 space-y-6">
               <div>
                 <label className="mb-2 block text-sm font-semibold text-navy">
                   Email address
                 </label>
+
                 <input
                   type="email"
                   required
@@ -89,6 +106,7 @@ export default function LoginPage() {
                 <label className="mb-2 block text-sm font-semibold text-navy">
                   Password
                 </label>
+
                 <div className="relative">
                   <input
                     type={showPassword ? "text" : "password"}
@@ -99,19 +117,29 @@ export default function LoginPage() {
                     placeholder="Enter your password"
                     className="w-full rounded-xl border border-navy/15 bg-offwhite px-4 py-3.5 pr-12 text-sm outline-none transition focus:border-gold"
                   />
+
                   <button
                     type="button"
                     onClick={() => setShowPassword((value) => !value)}
-                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    aria-label={
+                      showPassword ? "Hide password" : "Show password"
+                    }
                     className="absolute right-4 top-1/2 -translate-y-1/2 text-navy/50"
                   >
-                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    {showPassword ? (
+                      <EyeOff size={18} />
+                    ) : (
+                      <Eye size={18} />
+                    )}
                   </button>
                 </div>
               </div>
 
               {error && (
-                <p role="alert" className="rounded-xl bg-red-50 p-3 text-sm text-red-700">
+                <p
+                  role="alert"
+                  className="rounded-xl bg-red-50 p-3 text-sm text-red-700"
+                >
                   {error}
                 </p>
               )}
