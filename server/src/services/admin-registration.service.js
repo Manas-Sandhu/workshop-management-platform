@@ -16,6 +16,7 @@ async function getAllWorkshops() {
       description: true,
       dateTime: true,
       capacity: true,
+      whatsappLink: true,
       status: true,
       createdAt: true,
       _count: {
