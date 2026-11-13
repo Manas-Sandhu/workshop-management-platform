@@ -21,8 +21,10 @@ export async function logoutUser() {
   });
 }
 
-export async function getCurrentUser() {
-  return apiFetch("/auth/me");
+export function getCurrentUser() {
+  return apiFetch("/auth/me", {
+    cache: "no-store",
+  });
 }
 
 // Update the logged-in user's profile.

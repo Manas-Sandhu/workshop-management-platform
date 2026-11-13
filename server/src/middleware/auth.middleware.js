@@ -12,10 +12,7 @@ async function authenticateUser(req, res, next) {
       });
     }
 
-    const tokenHash = crypto
-      .createHash("sha256")
-      .update(token)
-      .digest("hex");
+    const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
 
     const session = await prisma.refreshToken.findUnique({
       where: { tokenHash },
@@ -67,10 +64,9 @@ async function optionalAuthenticateUser(req, res, next) {
       return next();
     }
 
-    const tokenHash = crypto
-      .createHash("sha256")
-      .update(token)
-      .digest("hex");
+    const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
+
+    console.time("Auth session database lookup");
 
     const session = await prisma.refreshToken.findUnique({
       where: { tokenHash },
@@ -86,6 +82,8 @@ async function optionalAuthenticateUser(req, res, next) {
       },
     });
 
+    console.timeEnd("Auth session database lookup");
+
     if (
       session &&
       session.expiresAt > new Date() &&
@@ -99,4 +97,4 @@ async function optionalAuthenticateUser(req, res, next) {
     next(error);
   }
 }
-module.exports = { authenticateUser,optionalAuthenticateUser };
+module.exports = { authenticateUser, optionalAuthenticateUser };
