@@ -12,15 +12,39 @@ const adminRegistrationRoutes = require("./routes/admin-registration.routes");
 
 const app = express();
 
+// In production, fail loudly if CLIENT_URL is not set rather than
+// silently falling back to localhost (which would block all browser requests).
+const clientOrigin =
+  process.env.NODE_ENV === "production"
+    ? (() => {
+        if (!process.env.CLIENT_URL) {
+          console.error(
+            "FATAL: CLIENT_URL environment variable is required in production."
+          );
+          process.exit(1);
+        }
+        return process.env.CLIENT_URL;
+      })()
+    : process.env.CLIENT_URL || "http://localhost:5173";
+
+// Required so Express trusts the X-Forwarded-* headers set by Render's
+// reverse proxy. Without this, secure cookies are rejected by browsers.
+app.set("trust proxy", 1);
+
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    origin: clientOrigin,
     credentials: true,
   })
 );
 
 app.use(express.json());
 app.use(cookieParser());
+
+// Lightweight health-check — no database query, used by Render's health probe.
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "ok" });
+});
 
 app.get("/api/v1/health", (req, res) => {
   res.status(200).json({
