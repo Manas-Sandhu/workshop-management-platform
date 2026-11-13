@@ -1,10 +1,16 @@
 const { Resend } = require("resend");
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Created lazily: constructing Resend at import time throws when the key is
+// missing, which would crash the whole app (including /health) on startup.
+let resend = null;
 
 async function sendWorkshopConfirmationEmail(registration, workshop) {
   if (!process.env.RESEND_API_KEY) {
     throw new Error("RESEND_API_KEY is missing from environment variables");
+  }
+
+  if (!resend) {
+    resend = new Resend(process.env.RESEND_API_KEY);
   }
 
   if (!process.env.EMAIL_FROM) {
