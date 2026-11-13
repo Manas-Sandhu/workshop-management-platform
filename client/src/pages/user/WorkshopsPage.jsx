@@ -244,8 +244,8 @@ export default function WorkshopsPage() {
             aria-label="Sort workshops"
             className="rounded-xl border border-navy/15 bg-white px-4 py-3.5 text-sm text-navy outline-none focus:border-gold"
           >
-            <option value="soonest">Soonest first</option>
-            <option value="latest">Latest first</option>
+            <option value="soonest">Earliest first</option>
+            <option value="latest">Furthest first</option>
           </select>
         </div>
 
