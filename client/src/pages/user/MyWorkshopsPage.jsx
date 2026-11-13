@@ -65,9 +65,7 @@ function RegistrationCard({ registration }) {
   const upcoming = isUpcoming(registration);
 
   const canJoinGroup =
-    upcoming &&
-    workshop.status !== "CANCELLED" &&
-    workshop.whatsappLink;
+    upcoming && workshop.status !== "CANCELLED" && workshop.whatsappLink;
 
   return (
     <article className="group overflow-hidden rounded-2xl border border-navy/10 bg-white transition duration-300 hover:-translate-y-1 hover:border-gold/60 hover:shadow-xl hover:shadow-navy/5">
@@ -77,10 +75,7 @@ function RegistrationCard({ registration }) {
             Workshop Registration
           </p>
 
-          <StatusBadge
-            status={workshop.status}
-            upcoming={upcoming}
-          />
+          <StatusBadge status={workshop.status} upcoming={upcoming} />
         </div>
 
         <div className="mt-5 flex flex-col justify-between gap-5 md:flex-row md:items-start">
@@ -109,10 +104,7 @@ function RegistrationCard({ registration }) {
           </div>
 
           <div className="shrink-0">
-            <StatusBadge
-              status={workshop.status}
-              upcoming={upcoming}
-            />
+            <StatusBadge status={workshop.status} upcoming={upcoming} />
           </div>
         </div>
 
@@ -175,11 +167,7 @@ export default function MyWorkshopsPage() {
         setLoading(true);
         setError("");
 
-        const result = await getMyRegistrations(
-          page,
-          10,
-          userId
-        );
+        const result = await getMyRegistrations(page, 10, userId);
 
         if (active) {
           setRegistrations(result.registrations);
@@ -188,8 +176,7 @@ export default function MyWorkshopsPage() {
       } catch (err) {
         if (active) {
           setError(
-            err.message ||
-              "We couldn't load your workshops. Please try again."
+            err.message || "We couldn't load your workshops. Please try again.",
           );
         }
       } finally {
@@ -204,13 +191,7 @@ export default function MyWorkshopsPage() {
     return () => {
       active = false;
     };
-  }, [
-    page,
-    refreshKey,
-    userId,
-    isAuthenticated,
-    authLoading,
-  ]);
+  }, [page, refreshKey, userId, isAuthenticated, authLoading]);
 
   function handleRefresh() {
     clearMyRegistrationsCache(userId);
@@ -222,20 +203,17 @@ export default function MyWorkshopsPage() {
       return registrations.filter(
         (registration) =>
           isUpcoming(registration) &&
-          registration.workshop.status !== "CANCELLED"
+          registration.workshop.status !== "CANCELLED",
       );
     }
 
     if (activeTab === "past") {
-      return registrations.filter(
-        (registration) => !isUpcoming(registration)
-      );
+      return registrations.filter((registration) => !isUpcoming(registration));
     }
 
     if (activeTab === "cancelled") {
       return registrations.filter(
-        (registration) =>
-          registration.workshop.status === "CANCELLED"
+        (registration) => registration.workshop.status === "CANCELLED",
       );
     }
 
@@ -244,10 +222,32 @@ export default function MyWorkshopsPage() {
 
   if (authLoading) {
     return (
-      <main className="min-h-screen bg-offwhite px-6 py-20">
-        <div className="mx-auto max-w-7xl">
-          <div className="h-10 w-64 animate-pulse rounded-lg bg-cream" />
-        </div>
+      <main className="min-h-screen bg-offwhite">
+        <section className="bg-cream px-6 py-16 lg:px-10 lg:py-20">
+          <div className="mx-auto max-w-7xl">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#987438]">
+              Your journey
+            </p>
+
+            <h1 className="mt-3 font-display text-4xl font-semibold text-navy md:text-5xl">
+              My Workshops
+            </h1>
+
+            <p className="mt-4 max-w-xl text-sm leading-7 text-navy/60">
+              All your registered experiences, together in one place.
+            </p>
+          </div>
+        </section>
+
+        <section className="mx-auto max-w-7xl px-6 py-12 lg:px-10 lg:py-16">
+          <h2 className="font-display text-2xl font-semibold text-navy">
+            Your registrations
+          </h2>
+
+          <p className="mt-4 text-sm text-navy/50">
+            Preparing your workshops...
+          </p>
+        </section>
       </main>
     );
   }
@@ -348,13 +348,11 @@ export default function MyWorkshopsPage() {
 
         {/* Loading */}
         {loading && (
-          <div className="mt-8 space-y-5">
-            {[1, 2, 3].map((item) => (
-              <div
-                key={item}
-                className="h-52 animate-pulse rounded-2xl bg-cream"
-              />
-            ))}
+          <div className="mt-8 flex items-center gap-3 rounded-xl bg-white px-5 py-4">
+            <RefreshCw size={17} className="animate-spin text-gold" />
+            <p className="text-sm text-navy/60">
+              Loading your registrations...
+            </p>
           </div>
         )}
 
@@ -412,36 +410,33 @@ export default function MyWorkshopsPage() {
         )}
 
         {/* Pagination */}
-        {!loading &&
-          !error &&
-          pagination &&
-          pagination.totalPages > 1 && (
-            <div className="mt-10 flex items-center justify-between border-t border-navy/10 pt-6">
-              <p className="text-sm text-navy/50">
-                Page {pagination.page} of {pagination.totalPages}
-              </p>
+        {!loading && !error && pagination && pagination.totalPages > 1 && (
+          <div className="mt-10 flex items-center justify-between border-t border-navy/10 pt-6">
+            <p className="text-sm text-navy/50">
+              Page {pagination.page} of {pagination.totalPages}
+            </p>
 
-              <div className="flex gap-3">
-                <button
-                  type="button"
-                  disabled={page <= 1}
-                  onClick={() => setPage((current) => current - 1)}
-                  className="rounded-full border border-navy/15 px-5 py-2.5 text-sm font-semibold text-navy disabled:opacity-30"
-                >
-                  Previous
-                </button>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                disabled={page <= 1}
+                onClick={() => setPage((current) => current - 1)}
+                className="rounded-full border border-navy/15 px-5 py-2.5 text-sm font-semibold text-navy disabled:opacity-30"
+              >
+                Previous
+              </button>
 
-                <button
-                  type="button"
-                  disabled={page >= pagination.totalPages}
-                  onClick={() => setPage((current) => current + 1)}
-                  className="rounded-full bg-navy px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-30"
-                >
-                  Next
-                </button>
-              </div>
+              <button
+                type="button"
+                disabled={page >= pagination.totalPages}
+                onClick={() => setPage((current) => current + 1)}
+                className="rounded-full bg-navy px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-30"
+              >
+                Next
+              </button>
             </div>
-          )}
+          </div>
+        )}
       </section>
     </main>
   );
