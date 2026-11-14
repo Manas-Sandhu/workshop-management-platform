@@ -70,6 +70,12 @@ The platform operates through two strictly isolated portals backed by a unified 
 - **Learners & Community Members (`USER` role)**: Individuals looking to discover upcoming workshops, track their registered sessions across upcoming/past/cancelled states, and access session communication channels.
 - **Program Managers & Brand Administrators (`ADMIN` role)**: Operations teams responsible for scheduling sessions, managing seat inventory, monitoring registration velocity, and contacting attendees.
 
+### User Experience
+
+Explore the complete visual walkthrough of both administrator and participant experiences.
+
+**[View User Experience →](USER_EXPERIENCE.md)**
+
 ---
 
 ## 4. Problem Statement
