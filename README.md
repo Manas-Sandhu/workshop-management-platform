@@ -24,7 +24,7 @@ A full-stack, production-grade SaaS platform engineered for brands, educators, a
 
 <br />
 
-[**Explore Live Demo**](https://workshop-client-delta.vercel.app/) · [**System Architecture**](#9-system-architecture) · [**API Reference**](#12-api-documentation) · [**Database Design**](#11-database-design) · [**Deployment Guide**](#16-deployment-guide)
+[**Explore Live Demo**](https://workshop-client-delta.vercel.app/) · [**System Architecture**](#9-system-architecture) · [**API Reference**](#11-api-documentation) · [**Deployment Guide**](#15-deployment-guide)
 
 </div>
 
@@ -42,18 +42,17 @@ A full-stack, production-grade SaaS platform engineered for brands, educators, a
 8. [Complete Application Workflow](#8-complete-application-workflow)
 9. [System Architecture](#9-system-architecture)
 10. [Technology Stack](#10-technology-stack)
-11. [Database Design](#11-database-design)
-12. [API Documentation](#12-api-documentation)
-13. [Folder Structure](#13-folder-structure)
-14. [Installation and Local Setup](#14-installation-and-local-setup)
-15. [Environment Variables](#15-environment-variables)
-16. [Deployment Guide](#16-deployment-guide)
-17. [Security and Reliability](#17-security-and-reliability)
-18. [UI/UX and Design](#18-uiux-and-design)
-19. [Future Scope](#19-future-scope)
-20. [Contributing Guidelines](#20-contributing-guidelines)
-21. [Troubleshooting](#21-troubleshooting)
-22. [License and Acknowledgements](#22-license-and-acknowledgements)
+11. [API Documentation](#11-api-documentation)
+12. [Folder Structure](#12-folder-structure)
+13. [Installation and Local Setup](#13-installation-and-local-setup)
+14. [Environment Variables](#14-environment-variables)
+15. [Deployment Guide](#15-deployment-guide)
+16. [Security and Reliability](#16-security-and-reliability)
+17. [UI/UX and Design](#17-uiux-and-design)
+18. [Future Scope](#18-future-scope)
+19. [Contributing Guidelines](#19-contributing-guidelines)
+20. [Troubleshooting](#20-troubleshooting)
+21. [License and Acknowledgements](#21-license-and-acknowledgements)
 
 ---
 
@@ -356,71 +355,7 @@ flowchart TB
 
 ---
 
-## 11. Database Design
-
-The PostgreSQL database is managed via Prisma (`server/prisma/schema.prisma`) and consists of **4 models** and **2 enums**.
-
-### Entity-Relationship Diagram
-
-```mermaid
-erDiagram
-    User ||--o{ Workshop : "creates (createdById)"
-    User ||--o{ Registration : "books (userId)"
-    User ||--o{ RefreshToken : "owns (userId)"
-    Workshop ||--o{ Registration : "has (workshopId)"
-
-    User {
-        String id PK "UUID v4 (@default(uuid()))"
-        String name "2-100 chars"
-        String email UK "@unique, lowercase"
-        String passwordHash "bcrypt (12 rounds)"
-        Role role "ADMIN | USER (@default(USER))"
-        DateTime createdAt "@default(now())"
-    }
-
-    Workshop {
-        String id PK "UUID v4 (@default(uuid()))"
-        String createdById FK "References User.id (ON DELETE RESTRICT)"
-        String title "3-150 chars"
-        String description "Nullable, up to 2000 chars"
-        DateTime dateTime "Scheduled session timestamp"
-        Int capacity "Positive integer (> 0)"
-        String whatsappLink "Valid URL to WhatsApp group"
-        WorkshopStatus status "PUBLISHED | CANCELLED (@default(PUBLISHED))"
-        DateTime createdAt "@default(now())"
-        DateTime updatedAt "@updatedAt"
-    }
-
-    Registration {
-        String id PK "UUID v4 (@default(uuid()))"
-        String userId FK "References User.id (ON DELETE RESTRICT)"
-        String workshopId FK "References Workshop.id (ON DELETE RESTRICT)"
-        String fullName "Attendee submitted name"
-        String email "Attendee submitted email"
-        String mobileNumber "10-15 digits (+optional)"
-        DateTime registeredAt "@default(now())"
-    }
-
-    RefreshToken {
-        String id PK "UUID v4 (@default(uuid()))"
-        String userId FK "References User.id (ON DELETE CASCADE)"
-        String tokenHash UK "@unique, SHA-256 hex digest"
-        DateTime expiresAt "7 days from login"
-        DateTime createdAt "@default(now())"
-    }
-```
-
-### Database Constraints & Business Rules
-1. **Unique Email Constraint (`User_email_key`)**: Enforces one account per normalized (trimmed, lowercase) email address.
-2. **Composite Unique Registration Constraint (`@@unique([userId, workshopId])`)**: Guarantees at the database level that a user can never book the same workshop twice, acting as a hard safety net behind the application-level check.
-3. **Referential Integrity (`ON DELETE RESTRICT` vs `ON DELETE CASCADE`)**:
-   - `Workshop.createdById`, `Registration.userId`, and `Registration.workshopId` use `ON DELETE RESTRICT` to prevent accidental deletion of users or workshops that have historical registration records.
-   - `RefreshToken.userId` uses `ON DELETE CASCADE` so deleting a user automatically purges all of their active sessions.
-4. **Pessimistic Concurrency Control**: Capacity-sensitive mutations (`registerForWorkshop`, `updateWorkshop`, `cancelWorkshop`, `publishWorkshop`) acquire a PostgreSQL row lock (`SELECT "id" FROM "Workshop" WHERE "id" = $1 FOR UPDATE`) before reading registration counts or mutating status.
-
----
-
-## 12. API Documentation
+## 11. API Documentation
 
 In production on Vercel, the frontend calls `/api/<endpoint>`, which is rewritten to `/api/v1/<endpoint>` on the backend. Only `/health` is mounted at the root path `/health`.
 
@@ -557,7 +492,7 @@ In production on Vercel, the frontend calls `/api/<endpoint>`, which is rewritte
 
 ---
 
-## 13. Folder Structure
+## 12. Folder Structure
 
 ```text
 workshop-management-platform/
@@ -670,7 +605,7 @@ workshop-management-platform/
 
 ---
 
-## 14. Installation and Local Setup
+## 13. Installation and Local Setup
 
 ### Prerequisites
 - **Node.js**: `v20.x` or `v22.x+` (verified on `v22` and `v24`)
@@ -695,7 +630,7 @@ npm install
 ```bash
 cp .env.example .env
 ```
-Open `server/.env` and populate your PostgreSQL URLs, session secret, Resend credentials, and admin seed credentials (see [Section 15](#15-environment-variables) for full details).
+Open `server/.env` and populate your PostgreSQL URLs, session secret, Resend credentials, and admin seed credentials (see [Section 14](#14-environment-variables) for full details).
 
 ### Step 4: Apply Database Migrations & Seed the Admin Account
 ```bash
@@ -734,7 +669,7 @@ npm run preview
 
 ---
 
-## 15. Environment Variables
+## 14. Environment Variables
 
 ### Backend (`server/.env`)
 
@@ -791,11 +726,11 @@ VITE_API_BASE_URL=
 
 ---
 
-## 16. Deployment Guide
+## 15. Deployment Guide
 
 The platform is deployed in production across **Vercel** (Frontend SPA + Serverless Express Backend) and **Neon** (Serverless PostgreSQL), and is equally compatible with **Render** for long-running container hosting.
 
-### 16.1 Database Setup (Neon PostgreSQL)
+### 15.1 Database Setup (Neon PostgreSQL)
 1. Create a Neon project and copy both connection strings:
    - **Pooled connection** (contains `-pooler` in hostname) → set as `DATABASE_URL`.
    - **Direct connection** (no `-pooler` in hostname) → set as `DIRECT_URL`.
@@ -806,7 +741,7 @@ The platform is deployed in production across **Vercel** (Frontend SPA + Serverl
    npm run db:seed-admin
    ```
 
-### 16.2 Backend Deployment
+### 15.2 Backend Deployment
 - **Root Directory**: `server`
 - **Build / Install Command**: `npm install` (runs `postinstall` → `prisma generate` automatically)
 - **Start Command (Render)**: `npm start` (`node ./src/server.js`)
@@ -814,7 +749,7 @@ The platform is deployed in production across **Vercel** (Frontend SPA + Serverl
 - **Health Check Path**: `/health`
 - **Required Production Environment Variables**: `NODE_ENV=production`, `DATABASE_URL`, `DIRECT_URL`, `SESSION_SECRET`, `CLIENT_URL=https://workshop-client-delta.vercel.app`, `RESEND_API_KEY`, `EMAIL_FROM`.
 
-### 16.3 Frontend Deployment (Vercel)
+### 15.3 Frontend Deployment (Vercel)
 - **Root Directory**: `client`
 - **Framework Preset**: `Vite`
 - **Build Command**: `npm run build`
@@ -836,7 +771,7 @@ The platform is deployed in production across **Vercel** (Frontend SPA + Serverl
   }
   ```
 
-### 16.4 Post-Deployment Verification
+### 15.4 Post-Deployment Verification
 ```bash
 # 1. Verify backend health probe
 curl -i https://workshop-server.vercel.app/health
@@ -847,7 +782,7 @@ curl -i https://workshop-client-delta.vercel.app/api/workshops
 
 ---
 
-## 17. Security and Reliability
+## 16. Security and Reliability
 
 ### Implemented Protections
 - **Hashed Session Tokens at Rest**: Raw session tokens (`sessionToken`, `adminSessionToken`) only exist in the browser's `HttpOnly` cookie. The database stores only `crypto.createHash("sha256").update(token).digest("hex")`, preventing session hijacking even if the `RefreshToken` table were leaked.
@@ -866,7 +801,7 @@ curl -i https://workshop-client-delta.vercel.app/api/workshops
 
 ---
 
-## 18. UI/UX and Design
+## 17. UI/UX and Design
 
 **WORKSHOP.** is designed with a warm, editorial aesthetic inspired by modern learning collectives and design studios.
 
@@ -887,7 +822,7 @@ curl -i https://workshop-client-delta.vercel.app/api/workshops
 
 ---
 
-## 19. Future Scope
+## 18. Future Scope
 
 The following items are **proposed future enhancements** (not currently implemented in the codebase):
 
@@ -899,7 +834,7 @@ The following items are **proposed future enhancements** (not currently implemen
 
 ---
 
-## 20. Contributing Guidelines
+## 19. Contributing Guidelines
 
 1. **Fork & Clone** the repository.
 2. **Create a Feature Branch** from `main` following the team's naming convention:
@@ -920,7 +855,7 @@ The following items are **proposed future enhancements** (not currently implemen
 
 ---
 
-## 21. Troubleshooting
+## 20. Troubleshooting
 
 <details>
 <summary><strong>1. Prisma 7 Error: <code>PrismaConfigEnvError: Cannot resolve environment variable: DIRECT_URL</code></strong></summary>
@@ -959,7 +894,7 @@ The following items are **proposed future enhancements** (not currently implemen
 
 ---
 
-## 22. License and Acknowledgements
+## 21. License and Acknowledgements
 
 - **License**: Distributed under the **ISC License** (see [`server/package.json`](./server/package.json)).
 - **Acknowledgements**:
