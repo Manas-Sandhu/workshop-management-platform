@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { defineConfig, env } from "prisma/config";
+import { defineConfig } from "prisma/config";
 
 export default defineConfig({
   schema: "prisma/schema.prisma",
@@ -7,6 +7,9 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    url: env("DIRECT_URL"),
+    // DIRECT_URL (Neon direct, non-pooled) is used by `prisma migrate`.
+    // Read it leniently so `prisma generate` (which needs no database)
+    // still works during builds where DIRECT_URL is not set.
+    url: process.env.DIRECT_URL ?? "",
   },
 });

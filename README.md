@@ -1,5 +1,7 @@
 # Workshop Management Platform
 
+https://workshop-client-delta.vercel.app/
+
 A full-stack workshop and event management platform designed for brands, organisations, and communities to create, publish, manage, and conduct recurring workshops and interactive sessions.
 
 ## Project Overview

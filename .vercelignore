@@ -1,0 +1,7 @@
+# Files excluded from `vercel deploy` uploads. Never upload local secrets.
+**/.env
+**/.env.*
+!**/.env.example
+**/node_modules
+**/dist
+.vercel
