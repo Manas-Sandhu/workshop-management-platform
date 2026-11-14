@@ -2,7 +2,8 @@
 // In local dev set VITE_API_BASE_URL in client/.env (e.g. http://localhost:5001).
 // In production on Vercel the rewrite proxy maps /api → the Render backend, so
 // we default to "/api" (same-origin) and no CORS pre-flight is needed.
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "/api";
+// `||` (not `??`) so an empty VITE_API_BASE_URL also falls back to "/api".
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api";
 
 async function apiFetch(endpoint, options = {}) {
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {

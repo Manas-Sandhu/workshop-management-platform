@@ -1,0 +1,6 @@
+# Never upload local env files: Vite would bake their values into the bundle.
+.env
+.env.*
+!.env.example
+node_modules
+dist
