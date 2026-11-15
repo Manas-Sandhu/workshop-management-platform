@@ -5,6 +5,7 @@
 # WORKSHOP.
 
 ### Curated Workshop Discovery, Capacity-Safe Registration & Community Operations Platform
+https://workshop-client-delta.vercel.app
 
 A full-stack, production-grade SaaS platform engineered for brands, educators, and communities to publish interactive workshops, enforce concurrency-safe seat limits, automate transactional confirmations, and onboard participants directly into session-specific WhatsApp communities.
 
